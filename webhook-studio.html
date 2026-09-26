@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Abyss Webhook Studio</title>
+<style>
+:root{--bg:#f4f4f6;--panel:#ffffff;--panel2:#f9f9fb;--border:#e2e2e6;--text:#1e1f22;--sub:#6b6f76;--accent:#7C5CFF;--accent-hover:#6845e0;--danger:#ed4245;--ok:#3ba55d;--warn:#f0b232;--disc-bg:#313338;--disc-embed:#2b2d31;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e0f1a;--panel:#161829;--panel2:#11121f;--border:#2a2c42;--text:#e7e8ea;--sub:#8c8fb3;}}
+:root[data-theme="dark"]{--bg:#0e0f1a;--panel:#161829;--panel2:#11121f;--border:#2a2c42;--text:#e7e8ea;--sub:#8c8fb3;}
+body.compact .panel{padding:10px}
+body.compact label{margin:6px 0 3px}
+body.compact .field-row,body.compact .var-row{margin-bottom:4px;padding:6px}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);}
+header{position:sticky;top:env(safe-area-inset-top,0);z-index:20;display:flex;align-items:center;gap:10px;padding:10px 18px;background:linear-gradient(180deg,var(--panel),var(--panel2));border-bottom:1px solid var(--border);flex-wrap:wrap;box-shadow:0 1px 0 var(--accent)33}
+header h1{font-size:15px;margin:0;font-weight:700;flex:1}
+button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:8px 14px;background:var(--accent);color:#fff;font-weight:600;transition:.15s}
+button:hover{background:var(--accent-hover)}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border)}
+button.secondary:hover{background:var(--border)}
+button.small{padding:5px 10px;font-size:12px}
+input,textarea,select{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 10px;font:inherit;font-size:13px;resize:vertical;}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+input[type=color]{padding:2px;height:32px}
+label{font-size:12px;font-weight:600;color:var(--sub);display:block;margin:10px 0 4px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1;min-width:0}
+.wrap{display:grid;grid-template-columns:1fr;gap:16px;max-width:1480px;margin:0 auto;padding:16px}
+@media(min-width:1000px){.wrap{grid-template-columns:1.15fr 1fr;align-items:start}}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.panel>h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.tabs{display:flex;gap:2px;margin-bottom:12px;border-bottom:1px solid var(--border);overflow-x:auto}
+.tabs button{background:none;color:var(--sub);border-radius:6px 6px 0 0;padding:8px 12px;font-size:12px;white-space:nowrap}
+.tabs button.active{color:var(--accent);border-bottom:2px solid var(--accent);background:none}
+.tabpane{display:none}
+.tabpane.active{display:block}
+.embed-block{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;background:var(--panel2)}
+.embed-block .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.embed-block .hd strong{font-size:13px}
+.field-row{display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;padding:8px;border:1px solid var(--border);border-radius:6px}
+.field-row .col{flex:1}
+.field-row .btns{display:flex;flex-direction:column;gap:2px}
+.color-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.color-row input[type=color]{width:44px;flex:none}
+.swatch{width:20px;height:20px;border-radius:5px;border:1px solid var(--border);cursor:pointer;flex:none}
+.counter{font-size:11px;color:var(--sub);text-align:right;margin-top:2px}
+.counter.over{color:var(--danger);font-weight:700}
+.hint{font-size:11px;color:var(--sub);margin-top:4px}
+.list-scroll{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:240px;overflow-y:auto}
+.li-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);font-size:13px}
+.li-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li-item.active{border-color:var(--accent)}
+.li-item.ok{border-left:3px solid var(--ok)}
+.li-item.err{border-left:3px solid var(--danger)}
+.preview{background:var(--disc-bg);border-radius:10px;padding:16px;font-size:14px;color:#dbdee1;line-height:1.4}
+.preview .msg{display:flex;gap:12px}
+.preview .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;overflow:hidden}
+.preview .avatar img{width:100%;height:100%;object-fit:cover}
+.preview .name{font-weight:600;color:#fff}
+.preview .tag{font-size:10px;background:#5865F2;color:#fff;border-radius:3px;padding:1px 4px;vertical-align:middle;margin-left:4px}
+.preview .content{white-space:pre-wrap;word-break:break-word;margin-top:2px}
+.preview .embed{position:relative;margin-top:8px;border-left:4px solid #5865F2;background:var(--disc-embed);border-radius:4px;padding:10px 12px;max-width:520px}
+.preview .embed .rm-embed{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:4px;width:22px;height:22px;font-size:13px;cursor:pointer;opacity:0;transition:.15s}
+.preview .embed:hover .rm-embed{opacity:1}
+.preview .embed .rm-embed:hover{background:var(--danger)}
+.preview .e-author{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;margin-bottom:4px}
+.preview .e-author img{width:20px;height:20px;border-radius:50%}
+.preview .e-title{font-weight:700;color:#fff;margin-bottom:4px}
+.preview .e-desc{white-space:pre-wrap;word-break:break-word;color:#dbdee1;font-size:13px}
+.preview .e-fields{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.preview .e-field{font-size:12px}
+.preview .e-field.inline{flex:1 0 30%}
+.preview .e-field.full{flex:1 0 100%}
+.preview .e-field b{display:block;color:#fff;font-size:13px;margin-bottom:2px}
+.preview .e-img{margin-top:8px;max-width:100%;border-radius:4px;display:block}
+.preview .e-thumb{width:80px;height:80px;object-fit:cover;border-radius:4px;float:right;margin-left:10px}
+.preview .e-footer{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#949ba4}
+.preview .e-footer img{width:18px;height:18px;border-radius:50%}
+.preview .btnrow{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.preview .fakebtn{position:relative;background:#4e5058;color:#fff;border-radius:4px;padding:6px 26px 6px 12px;font-size:13px;font-weight:500}
+.preview .fakebtn.primary{background:#5865F2}
+.preview .fakebtn .rm-btn{position:absolute;top:3px;right:4px;background:none;border:none;color:#fff9;font-size:12px;cursor:pointer}
+.preview .fakebtn .rm-btn:hover{color:#fff}
+.status{font-size:13px;padding:10px 12px;border-radius:8px;margin-top:10px;display:none}
+.status.ok{display:block;background:rgba(59,165,93,.12);color:var(--ok)}
+.status.err{display:block;background:rgba(237,66,69,.12);color:var(--danger)}
+.status.info{display:block;background:rgba(88,101,242,.12);color:var(--accent)}
+.warn-box{font-size:12px;background:rgba(240,178,50,.12);color:var(--warn);border-radius:8px;padding:8px 10px;margin-top:8px;display:none}
+.var-row{display:flex;gap:6px;margin-bottom:6px}
+.footer-note{text-align:center;font-size:11px;color:var(--sub);padding:20px}
+.icon-btn{background:none;border:none;color:var(--sub);font-size:14px;padding:2px 6px}
+.icon-btn:hover{color:var(--danger)}
+textarea.json{min-height:120px;font-family:ui-monospace,monospace;font-size:12px}
+.chip{display:inline-block;font-size:11px;background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;margin:2px 4px 2px 0;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.checkbox-inline{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);font-weight:600}
+.checkbox-inline input{width:auto}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.gallery .card{border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;background:var(--panel2);font-size:12px}
+.gallery .card:hover{border-color:var(--accent)}
+.gallery .card .sw{height:5px;border-radius:3px;margin-bottom:6px}
+.sticky-side{position:sticky;top:64px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🕳️ Abyss Webhook Studio</h1>
+  <label class="checkbox-inline" style="margin:0">Theme
+    <select id="themePreset" style="width:auto;padding:4px 8px" onchange="applyThemePreset(this.value)">
+      <option value="abyss">Abyss (violet)</option>
+      <option value="ocean">Ocean (teal)</option>
+      <option value="crimson">Crimson</option>
+      <option value="sunset">Sunset</option>
+      <option value="classic">Classic Discord</option>
+      <option value="custom">Custom…</option>
+    </select>
+  </label>
+  <label class="checkbox-inline" style="margin:0">Accent <input type="color" id="accentPicker" style="width:32px;height:26px;padding:0"></label>
+  <label class="checkbox-inline" style="margin:0"><input type="checkbox" id="compactToggle" onchange="document.body.classList.toggle('compact',this.checked);localStorage.setItem('wh_compact',this.checked)"> Compact</label>
+  <button class="secondary small" onclick="toggleTheme()">🌓 Light/Dark</button>
+</header>
+
+<div class="wrap">
+<div>
+
+  <div class="panel">
+    <h2>Library</h2>
+    <div class="tabs">
+      <button class="active" data-t="lib-wh" onclick="switchTab(this,'lib')">Webhooks</button>
+      <button data-t="lib-tpl" onclick="switchTab(this,'lib')">Templates</button>
+      <button data-t="lib-var" onclick="switchTab(this,'lib')">Variables</button>
+      <button data-t="lib-cv" onclick="switchTab(this,'lib')">Variants</button>
+      <button data-t="lib-bot" onclick="switchTab(this,'lib')">Bot Connect</button>
+      <button data-t="lib-sched" onclick="switchTab(this,'lib')">Scheduled</button>
+      <button data-t="lib-hist" onclick="switchTab(this,'lib')">History</button>
+      <button data-t="lib-backup" onclick="switchTab(this,'lib')">Backup</button>
+    </div>
+
+    <div class="tabpane active" id="lib-wh">
+      <div class="row" style="margin-bottom:8px">
+        <input id="whSearch" placeholder="🔍 Filter webhooks…" oninput="renderWh()">
+        <select id="whGroupFilter" style="max-width:140px" onchange="renderWh()"><option value="">All groups</option></select>
+      </div>
+      <div class="list-scroll" id="whList"></div>
+      <div class="row"><input id="whName" placeholder="Label (e.g. #announcements)"><input id="whGroup" placeholder="Group tag (optional, e.g. Staff)"></div>
+      <div class="row" style="margin-top:6px">
+        <input id="whUrl" placeholder="https://discord.com/api/webhooks/...">
+        <button class="small" onclick="addWebhook()">Add</button>
+      </div>
+      <p class="hint">★ pin favorites to the top. Checkboxes select targets for bulk send. Group tags let you filter large lists.</p>
+    </div>
+
+    <div class="tabpane" id="lib-tpl">
+      <input id="tplSearch" placeholder="🔍 Filter templates…" oninput="renderTemplates()" style="margin-bottom:8px">
+      <div class="list-scroll" id="tplList"></div>
+      <div class="row"><input id="tplName" placeholder="Template name"><button class="small" onclick="saveTemplate()">Save current</button></div>
+    </div>
+
+    <div class="tabpane" id="lib-var">
+      <div id="varList"></div>
+      <button class="secondary small" onclick="addVar()">+ Add variable</button>
+      <p class="hint">Use {{key}} anywhere in content, embeds, or fields.</p>
+    </div>
+
+    <div class="tabpane" id="lib-cv">
+      <p class="hint">Alternate message texts. Enable "Randomize" to pick one at random each send.</p>
+      <div id="variantList"></div>
+      <button class="secondary small" onclick="addVariant()">+ Add variant</button>
+      <label class="checkbox-inline" style="margin-top:10px"><input type="checkbox" id="randomizeToggle"> Randomize content on send</label>
+    </div>
+
+    <div class="tabpane" id="lib-bot">
+      <p class="hint">Create a webhook for any channel automatically — no need to make one in Discord's UI first. Requires a <b>bot token</b> (from a bot already in that server, with "Manage Webhooks" permission) and the <b>channel ID</b>. A channel ID by itself can't authenticate anything — this is Discord's own security model.</p>
+      <label>Bot token</label>
+      <input type="password" id="botToken" placeholder="Bot token (from the Discord Developer Portal)">
+      <label class="checkbox-inline" style="margin-top:6px"><input type="checkbox" id="rememberToken"> Remember token in this browser (localStorage)</label>
+      <label>Channel ID</label>
+      <input id="botChannelId" placeholder="e.g. 123456789012345678">
+      <label>Webhook name</label>
+      <input id="botWhName" placeholder="Abyss Webhook Studio" value="Abyss Webhook Studio">
+      <div class="row" style="margin-top:10px">
+        <button class="small" onclick="createWebhookForChannel()">⚡ Create / reuse webhook for channel</button>
+      </div>
+      <div class="status" id="botStatus"></div>
+      <p class="hint" style="margin-top:10px">Your bot needs: added to the server, and the <b>Manage Webhooks</b> permission in that channel. Get a bot token at discord.com/developers/applications → your app → Bot → Reset Token.</p>
+    </div>
+
+    <div class="tabpane" id="lib-sched">
+      <p class="hint">Schedules a send while this tab stays open (no server, so it won't fire if you close the page).</p>
+      <div class="row">
+        <input type="number" id="schedMinutes" placeholder="Minutes from now" min="1" value="5">
+        <button class="small" onclick="scheduleSend()">⏱ Schedule current message</button>
+      </div>
+      <div class="list-scroll" id="schedList" style="margin-top:10px"></div>
+    </div>
+
+    <div class="tabpane" id="lib-hist">
+      <div class="row" id="statsRow" style="margin-bottom:10px"></div>
+      <button class="secondary small" onclick="clearHistory()" style="margin-bottom:8px">Clear history</button>
+      <div class="list-scroll" id="histList"></div>
+    </div>
+
+    <div class="tabpane" id="lib-backup">
+      <p class="hint">Export everything (webhooks, templates, variables) to a JSON file, or restore from one.</p>
+      <div class="row">
+        <button class="secondary small" onclick="exportBackup()">⬇ Export backup</button>
+        <button class="secondary small" onclick="document.getElementById('backupFile').click()">⬆ Import backup</button>
+      </div>
+      <input type="file" id="backupFile" accept=".json" style="display:none" onchange="importBackup(this.files[0])">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Compose</h2>
+    <div class="tabs">
+      <button class="active" data-t="cmp-msg" onclick="switchTab(this,'cmp')">Message</button>
+      <button data-t="cmp-embeds" onclick="switchTab(this,'cmp')">Embeds</button>
+      <button data-t="cmp-imggallery" onclick="switchTab(this,'cmp')">Image Gallery</button>
+      <button data-t="cmp-presets" onclick="switchTab(this,'cmp')">Preset Library</button>
+      <button data-t="cmp-btns" onclick="switchTab(this,'cmp')">Buttons</button>
+      <button data-t="cmp-export" onclick="switchTab(this,'cmp')">Export</button>
+    </div>
+
+    <div class="tabpane active" id="cmp-msg">
+      <label>Bot username override</label>
+      <input id="msgUsername" placeholder="Leave blank for webhook default">
+      <label>Bot avatar URL override</label>
+      <input id="msgAvatar" placeholder="https://...">
+      <label>Content</label>
+      <textarea id="msgContent" rows="3" placeholder="Message text (markdown supported)"></textarea>
+      <div class="counter" id="contentCounter">0 / 2000</div>
+      <div style="margin-top:6px">
+        <span class="chip" onclick="insertAtCursor('msgContent','@everyone')">@everyone</span>
+        <span class="chip" onclick="insertAtCursor('msgContent','@here')">@here</span>
+        <span class="chip" onclick="insertMention('role')">Role mention…</span>
+        <span class="chip" onclick="insertMention('user')">User mention…</span>
+        <span class="chip" onclick="insertAtCursor('msgContent','<t:'+Math.floor(Date.now()/1000)+':R>')">Relative timestamp</span>
+      </div>
+    </div>
+
+    <div class="tabpane" id="cmp-embeds">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span class="hint">Embeds (<span id="embedCount">0</span>/10)</span>
+        <button class="small" onclick="addEmbed()">+ Add embed</button>
+      </div>
+      <div id="embedsContainer"></div>
+    </div>
+
+    <div class="tabpane" id="cmp-imggallery">
+      <p class="hint">Discord visually stacks multiple images into one gallery block when their embeds share the same link. Add as many images as you want, remove any before sending, then build them into the message.</p>
+      <label>Gallery link (shared by every image — any URL works, it's just the glue)</label>
+      <input id="galUrl" placeholder="https://example.com/my-post">
+      <label>Title (shown once, on the first image)</label>
+      <input id="galTitle" placeholder="Gallery title">
+      <label>Description</label>
+      <textarea id="galDesc" rows="2" placeholder="Optional description"></textarea>
+      <div class="color-row" style="margin-top:6px">
+        <input type="color" id="galColor" value="#5865F2">
+        <span class="hint">Accent color</span>
+      </div>
+      <label style="margin-top:10px">Images (<span id="galCount">0</span>)</label>
+      <div id="galImages"></div>
+      <div class="row" style="margin-top:6px">
+        <input id="galNewImg" placeholder="Image URL">
+        <button class="small" onclick="addGalImage()">+ Add image</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button onclick="buildImageGallery()">🖼 Build gallery into message</button>
+        <button class="secondary" onclick="clearGalImages()">Clear images</button>
+      </div>
+    </div>
+
+    <div class="tabpane" id="cmp-presets">
+      <p class="hint">One-click starting points — click a card to add that embed. Save any embed you build as a new preset, or remove ones you don't want.</p>
+      <div class="row" style="margin-bottom:10px">
+        <button class="secondary small" onclick="exportGallery()">⬇ Export gallery</button>
+        <button class="secondary small" onclick="document.getElementById('galleryFile').click()">⬆ Import gallery</button>
+        <button class="secondary small" onclick="resetGallery()">↺ Reset to defaults</button>
+      </div>
+      <input type="file" id="galleryFile" accept=".json" style="display:none" onchange="importGallery(this.files[0])">
+      <div class="gallery" id="presetGallery"></div>
+    </div>
+
+
+    <div class="tabpane" id="cmp-btns">
+      <p class="hint">Plain webhooks can't power real interactive buttons (needs a bot with an Interactions endpoint) — this previews the layout.</p>
+      <div id="btnList"></div>
+      <button class="secondary small" onclick="addBtn()">+ Add button</button>
+    </div>
+
+    <div class="tabpane" id="cmp-export">
+      <textarea class="json" id="jsonBox" placeholder='{"content":"...","embeds":[...]}'></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="secondary small" onclick="importJson()">Import</button>
+        <button class="secondary small" onclick="exportJson()">Export JSON →</button>
+        <button class="secondary small" onclick="exportCurl()">Export cURL →</button>
+        <button class="secondary small" onclick="copyBox()">Copy box</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sticky-side">
+  <div class="panel">
+    <h2>Live Preview</h2>
+    <div class="preview" id="previewBox"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Send</h2>
+    <label>Active webhook (single send)</label>
+    <select id="sendTarget"></select>
+    <div class="row" style="margin-top:10px">
+      <button onclick="sendMessage()">🚀 Send now <span class="hint" style="color:#fff8">(Ctrl+Enter)</span></button>
+      <button class="secondary" onclick="checkWebhook()">✓ Verify URL</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="secondary" onclick="sendBulk()">📤 Send to checked webhooks</button>
+    </div>
+    <label style="margin-top:10px">Edit existing message (optional)</label>
+    <input id="editMsgId" placeholder="Message ID to edit instead of posting new">
+    <div class="warn-box" id="warnBox"></div>
+    <div class="status" id="statusBox"></div>
+  </div>
+</div>
+</div>
+
+<div class="footer-note">Client-side only. No accounts, no tracking, no backend. Scheduling only fires while this tab is open.</div>
+
+<script>
+let state = { username:'', avatar:'', content:'', embeds:[], buttons:[] };
+let vars = [], variants = [], scheduled = [];
+let webhooks = JSON.parse(localStorage.getItem('wh_list')||'[]');
+let activeWh = localStorage.getItem('wh_active')||null;
+let checkedWh = new Set(JSON.parse(localStorage.getItem('wh_checked')||'[]'));
+let favWh = new Set(JSON.parse(localStorage.getItem('wh_fav')||'[]'));
+let templates = JSON.parse(localStorage.getItem('wh_templates')||'{}');
+let history_ = JSON.parse(localStorage.getItem('wh_history')||'[]');
+const LIMITS = {content:2000, maxEmbeds:10, maxFields:25, totalEmbed:6000};
+const PRESETS = ['#5865F2','#57F287','#FEE75C','#EB459E','#ED4245','#3BA55D','#F0B232','#1ABC9C','#9B59B6','#607D8B'];
+const DEFAULT_GALLERY = [
+  {id:'d1',name:'Announcement',color:'#5865F2',title:'📢 Announcement',description:'Write your announcement here.',url:'',authorName:'',authorUrl:'',authorIcon:'',thumbnail:'',image:'',footerText:'',footerIcon:'',timestamp:false,fields:[]},
+  {id:'d2',name:'Success',color:'#57F287',title:'✅ Success',description:'Something completed successfully.',url:'',authorName:'',authorUrl:'',authorIcon:'',thumbnail:'',image:'',footerText:'',footerIcon:'',timestamp:false,fields:[]},
+  {id:'d3',name:'Error',color:'#ED4245',title:'❌ Error',description:'Something went wrong.',url:'',authorName:'',authorUrl:'',authorIcon:'',thumbnail:'',image:'',footerText:'',footerIcon:'',timestamp:false,fields:[]},
+  {id:'d4',name:'Warning',color:'#F0B232',title:'⚠️ Warning',description:'Heads up about something.',url:'',authorName:'',authorUrl:'',authorIcon:'',thumbnail:'',image:'',footerText:'',footerIcon:'',timestamp:false,fields:[]},
+  {id:'d5',name:'Info',color:'#1ABC9C',title:'ℹ️ Info',description:'General information.',url:'',authorName:'',authorUrl:'',authorIcon:'',thumbnail:'',image:'',footerText:'',footerIcon:'',timestamp:false,fields:[]},
+  {id:'d6',name:'Event',color:'#9B59B6',title:'🎉 New Event',description:'Details about the event go here.',url:'',authorName:'',authorUrl:'',authorIcon:'',thumbnail:'',image:'',footerText:'',footerIcon:'',timestamp:false,fields:[]}
+];
+let gallery = JSON.parse(localStorage.getItem('wh_gallery')||'null') || JSON.parse(JSON.stringify(DEFAULT_GALLERY));
+
+
+function uid(){return Math.random().toString(36).slice(2,9)}
+function escapeHtml(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function escapeAttr(s){return escapeHtml(s)}
+
+function toggleTheme(){const r=document.documentElement;r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'light':'dark')}
+document.getElementById('accentPicker').addEventListener('input',e=>{document.documentElement.style.setProperty('--accent',e.target.value);localStorage.setItem('wh_accent',e.target.value);document.getElementById('themePreset').value='custom'});
+const THEME_PRESETS = {
+  abyss:{accent:'#7C5CFF',hover:'#6845e0'},
+  ocean:{accent:'#14B8A6',hover:'#0d9488'},
+  crimson:{accent:'#EF4444',hover:'#dc2626'},
+  sunset:{accent:'#F97316',hover:'#ea580c'},
+  classic:{accent:'#5865F2',hover:'#4752c4'}
+};
+function applyThemePreset(name){
+  const p=THEME_PRESETS[name]; if(!p) return;
+  document.documentElement.style.setProperty('--accent',p.accent);
+  document.documentElement.style.setProperty('--accent-hover',p.hover);
+  document.getElementById('accentPicker').value=p.accent;
+  localStorage.setItem('wh_accent',p.accent);
+  localStorage.setItem('wh_theme_preset',name);
+}
+(function(){
+  const a=localStorage.getItem('wh_accent');
+  const tp=localStorage.getItem('wh_theme_preset')||'abyss';
+  document.getElementById('themePreset').value=tp;
+  if(a){document.documentElement.style.setProperty('--accent',a);document.getElementById('accentPicker').value=a}
+  else applyThemePreset('abyss');
+  if(localStorage.getItem('wh_compact')==='true'){document.body.classList.add('compact');document.getElementById('compactToggle').checked=true}
+})();
+
+function switchTab(btn,group){
+  const bar=btn.parentElement;
+  [...bar.children].forEach(b=>b.classList.toggle('active',b===btn));
+  const panes=document.querySelectorAll(`[id^="${group}-"]`);
+  panes.forEach(p=>p.classList.toggle('active',p.id===btn.dataset.t));
+}
+
+function insertAtCursor(id,text){
+  const el=document.getElementById(id);
+  const s=el.selectionStart||el.value.length, e=el.selectionEnd||el.value.length;
+  el.value = el.value.slice(0,s)+text+el.value.slice(e);
+  state.content = el.value; el.focus(); renderPreview(); updateCounters();
+}
+function insertMention(kind){
+  const id = prompt(kind==='role'?'Role ID:':'User ID:');
+  if(!id) return;
+  insertAtCursor('msgContent', kind==='role'?`<@&${id}>`:`<@${id}>`);
+}
+
+// ---------- webhooks ----------
+function saveWh(){
+  localStorage.setItem('wh_list',JSON.stringify(webhooks));
+  localStorage.setItem('wh_active',activeWh||'');
+  localStorage.setItem('wh_checked',JSON.stringify([...checkedWh]));
+  localStorage.setItem('wh_fav',JSON.stringify([...favWh]));
+  renderWh();
+}
+function addWebhook(){
+  const name=document.getElementById('whName').value.trim();
+  const group=document.getElementById('whGroup').value.trim();
+  const url=document.getElementById('whUrl').value.trim();
+  if(!/^https:\/\/discord(app)?\.com\/api\/webhooks\//.test(url)){alert("That doesn't look like a Discord webhook URL.");return}
+  const id=uid();
+  webhooks.push({id,name:name||'Webhook',group,url}); activeWh=id;
+  document.getElementById('whName').value='';document.getElementById('whGroup').value='';document.getElementById('whUrl').value='';
+  saveWh();
+}
+function removeWh(id){webhooks=webhooks.filter(w=>w.id!==id);checkedWh.delete(id);favWh.delete(id);if(activeWh===id)activeWh=webhooks[0]?.id||null;saveWh()}
+function setActiveWh(id){activeWh=id;saveWh()}
+function toggleChecked(id){checkedWh.has(id)?checkedWh.delete(id):checkedWh.add(id);saveWh()}
+function toggleFav(id){favWh.has(id)?favWh.delete(id):favWh.add(id);saveWh()}
+function renderWh(){
+  const q=(document.getElementById('whSearch')?.value||'').toLowerCase();
+  const groupFilter=document.getElementById('whGroupFilter')?.value||'';
+  const groups=[...new Set(webhooks.map(w=>w.group).filter(Boolean))];
+  const gf=document.getElementById('whGroupFilter');
+  if(gf) gf.innerHTML = '<option value="">All groups</option>'+groups.map(g=>`<option value="${escapeAttr(g)}" ${g===groupFilter?'selected':''}>${escapeHtml(g)}</option>`).join('');
+  const sorted=[...webhooks].filter(w=>w.name.toLowerCase().includes(q) && (!groupFilter || w.group===groupFilter)).sort((a,b)=>(favWh.has(b.id)?1:0)-(favWh.has(a.id)?1:0));
+  const list=document.getElementById('whList');
+  list.innerHTML = sorted.length? sorted.map(w=>`
+    <div class="li-item ${w.id===activeWh?'active':''}">
+      <input type="checkbox" style="width:auto" ${checkedWh.has(w.id)?'checked':''} onchange="toggleChecked('${w.id}')">
+      <button class="icon-btn" onclick="toggleFav('${w.id}')" title="Favorite">${favWh.has(w.id)?'★':'☆'}</button>
+      <span onclick="setActiveWh('${w.id}')" style="cursor:pointer">${w.id===activeWh?'● ':'○ '}${escapeHtml(w.name)}${w.group?` <span style="color:var(--sub);font-size:11px">· ${escapeHtml(w.group)}</span>`:''}</span>
+      <button class="icon-btn" onclick="removeWh('${w.id}')">✕</button>
+    </div>`).join('') : '<p class="hint">No webhooks match.</p>';
+  const sel=document.getElementById('sendTarget');
+  sel.innerHTML = webhooks.map(w=>`<option value="${w.id}" ${w.id===activeWh?'selected':''}>${escapeHtml(w.name)}</option>`).join('') || '<option>No webhook added</option>';
+  sel.onchange = e=>setActiveWh(e.target.value);
+}
+
+// ---------- variables ----------
+function addVar(){vars.push({id:uid(),key:'',value:''});renderVars()}
+function removeVar(id){vars=vars.filter(v=>v.id!==id);renderVars();renderPreview()}
+function renderVars(){
+  document.getElementById('varList').innerHTML = vars.map(v=>`
+    <div class="var-row">
+      <input placeholder="key" value="${escapeAttr(v.key)}" oninput="updateVar('${v.id}','key',this.value)">
+      <input placeholder="value" value="${escapeAttr(v.value)}" oninput="updateVar('${v.id}','value',this.value)">
+      <button class="icon-btn" onclick="removeVar('${v.id}')">✕</button>
+    </div>`).join('');
+}
+function updateVar(id,field,val){const v=vars.find(x=>x.id===id);if(v){v[field]=val;renderPreview()}}
+function applyVars(str){if(!str)return str;let out=str;vars.forEach(v=>{if(v.key)out=out.split('{{'+v.key+'}}').join(v.value)});return out}
+
+// ---------- content variants ----------
+function addVariant(){variants.push({id:uid(),text:''});renderVariants()}
+function removeVariant(id){variants=variants.filter(v=>v.id!==id);renderVariants()}
+function updVariant(id,val){const v=variants.find(x=>x.id===id);v.text=val}
+function renderVariants(){
+  document.getElementById('variantList').innerHTML = variants.map(v=>`
+    <div class="var-row">
+      <textarea rows="2" placeholder="Alternate message text" oninput="updVariant('${v.id}',this.value)">${escapeHtml(v.text)}</textarea>
+      <button class="icon-btn" onclick="removeVariant('${v.id}')">✕</button>
+    </div>`).join('') || '<p class="hint">No variants added.</p>';
+}
+function pickContent(){
+  if(!document.getElementById('randomizeToggle').checked) return state.content;
+  const pool=[state.content, ...variants.map(v=>v.text)].filter(Boolean);
+  return pool.length ? pool[Math.floor(Math.random()*pool.length)] : state.content;
+}
+
+// ---------- embeds ----------
+function addEmbed(seed){
+  if(state.embeds.length>=LIMITS.maxEmbeds) return alert('Max 10 embeds per message.');
+  const clean = seed ? Object.assign({},seed) : {};
+  delete clean.id; delete clean.name;
+  clean.fields = (clean.fields||[]).map(f=>({id:uid(),name:f.name||'',value:f.value||'',inline:!!f.inline}));
+  state.embeds.push(Object.assign({id:uid(),color:'#5865F2',title:'',url:'',description:'',authorName:'',authorUrl:'',authorIcon:'',thumbnail:'',image:'',footerText:'',footerIcon:'',timestamp:false,fields:[]}, clean));
+  renderEmbeds();renderPreview();
+}
+function duplicateEmbed(id){
+  const e=state.embeds.find(x=>x.id===id);
+  const copy=JSON.parse(JSON.stringify(e));
+  copy.id=uid(); copy.fields=copy.fields.map(f=>({...f,id:uid()}));
+  state.embeds.splice(state.embeds.indexOf(e)+1,0,copy);
+  renderEmbeds();renderPreview();
+}
+function removeEmbed(id){state.embeds=state.embeds.filter(e=>e.id!==id);renderEmbeds();renderPreview()}
+function moveEmbed(id,dir){const i=state.embeds.findIndex(e=>e.id===id),j=i+dir;if(j<0||j>=state.embeds.length)return;[state.embeds[i],state.embeds[j]]=[state.embeds[j],state.embeds[i]];renderEmbeds();renderPreview()}
+function addField(embedId){const e=state.embeds.find(x=>x.id===embedId);if(e.fields.length>=LIMITS.maxFields)return alert('Max 25 fields.');e.fields.push({id:uid(),name:'',value:'',inline:true});renderEmbeds();renderPreview()}
+function removeField(embedId,fieldId){const e=state.embeds.find(x=>x.id===embedId);e.fields=e.fields.filter(f=>f.id!==fieldId);renderEmbeds();renderPreview()}
+function moveField(embedId,fieldId,dir){const e=state.embeds.find(x=>x.id===embedId);const i=e.fields.findIndex(f=>f.id===fieldId),j=i+dir;if(j<0||j>=e.fields.length)return;[e.fields[i],e.fields[j]]=[e.fields[j],e.fields[i]];renderEmbeds();renderPreview()}
+function updEmbed(id,key,val){const e=state.embeds.find(x=>x.id===id);e[key]=val;renderPreview();renderEmbeds()}
+function updField(embedId,fieldId,key,val){const e=state.embeds.find(x=>x.id===embedId);const f=e.fields.find(x=>x.id===fieldId);f[key]=val;renderPreview()}
+function embedSize(e){return (e.title?.length||0)+(e.description?.length||0)+(e.footerText?.length||0)+(e.authorName?.length||0)+e.fields.reduce((a,f)=>a+(f.name?.length||0)+(f.value?.length||0),0)}
+
+function renderEmbeds(){
+  document.getElementById('embedCount').textContent = state.embeds.length;
+  const c=document.getElementById('embedsContainer');
+  c.innerHTML = state.embeds.map((e,idx)=>`
+    <div class="embed-block">
+      <div class="hd">
+        <strong>Embed ${idx+1}</strong>
+        <div>
+          <button class="icon-btn" onclick="moveEmbed('${e.id}',-1)">↑</button>
+          <button class="icon-btn" onclick="moveEmbed('${e.id}',1)">↓</button>
+          <button class="icon-btn" onclick="duplicateEmbed('${e.id}')" title="Duplicate">⧉</button>
+          <button class="icon-btn" onclick="saveEmbedAsPreset('${e.id}')" title="Save as gallery preset">☆</button>
+          <button class="icon-btn" onclick="removeEmbed('${e.id}')">✕</button>
+        </div>
+      </div>
+      <div class="color-row">
+        <input type="color" value="${e.color}" oninput="updEmbed('${e.id}','color',this.value)">
+        ${PRESETS.map(p=>`<div class="swatch" style="background:${p}" onclick="updEmbed('${e.id}','color','${p}')"></div>`).join('')}
+      </div>
+      <label>Title</label>
+      <input value="${escapeAttr(e.title)}" maxlength="256" oninput="updEmbed('${e.id}','title',this.value)">
+      <label>Title link URL</label>
+      <input value="${escapeAttr(e.url)}" oninput="updEmbed('${e.id}','url',this.value)">
+      <label>Author name / URL / icon</label>
+      <div class="row">
+        <input placeholder="name" value="${escapeAttr(e.authorName)}" oninput="updEmbed('${e.id}','authorName',this.value)">
+        <input placeholder="link" value="${escapeAttr(e.authorUrl)}" oninput="updEmbed('${e.id}','authorUrl',this.value)">
+        <input placeholder="icon url" value="${escapeAttr(e.authorIcon)}" oninput="updEmbed('${e.id}','authorIcon',this.value)">
+      </div>
+      <label>Description</label>
+      <textarea rows="3" maxlength="4096" oninput="updEmbed('${e.id}','description',this.value)">${escapeHtml(e.description)}</textarea>
+      <label>Thumbnail URL</label>
+      <input value="${escapeAttr(e.thumbnail)}" oninput="updEmbed('${e.id}','thumbnail',this.value)">
+      <label>Image URL</label>
+      <input value="${escapeAttr(e.image)}" oninput="updEmbed('${e.id}','image',this.value)">
+      <label>Footer text / icon</label>
+      <div class="row">
+        <input placeholder="footer text" value="${escapeAttr(e.footerText)}" oninput="updEmbed('${e.id}','footerText',this.value)">
+        <input placeholder="icon url" value="${escapeAttr(e.footerIcon)}" oninput="updEmbed('${e.id}','footerIcon',this.value)">
+      </div>
+      <label class="checkbox-inline"><input type="checkbox" ${e.timestamp?'checked':''} onchange="updEmbed('${e.id}','timestamp',this.checked)"> Add current timestamp</label>
+      <label>Fields (${e.fields.length}/25) <button class="secondary small" style="margin-left:6px" onclick="addField('${e.id}')">+ field</button></label>
+      ${e.fields.map(f=>`
+        <div class="field-row">
+          <div class="col">
+            <input placeholder="Name" value="${escapeAttr(f.name)}" oninput="updField('${e.id}','${f.id}','name',this.value)">
+            <textarea rows="2" placeholder="Value" style="margin-top:4px" oninput="updField('${e.id}','${f.id}','value',this.value)">${escapeHtml(f.value)}</textarea>
+            <label class="checkbox-inline" style="display:inline-flex;margin-top:6px"><input type="checkbox" ${f.inline?'checked':''} onchange="updField('${e.id}','${f.id}','inline',this.checked)"> inline</label>
+          </div>
+          <div class="btns">
+            <button class="icon-btn" onclick="moveField('${e.id}','${f.id}',-1)">↑</button>
+            <button class="icon-btn" onclick="moveField('${e.id}','${f.id}',1)">↓</button>
+            <button class="icon-btn" onclick="removeField('${e.id}','${f.id}')">✕</button>
+          </div>
+        </div>`).join('')}
+      <div class="counter ${embedSize(e)>LIMITS.totalEmbed?'over':''}">${embedSize(e)} / ${LIMITS.totalEmbed} embed chars</div>
+    </div>
+  `).join('') || '<p class="hint">No embeds yet.</p>';
+}
+function saveGallery(){localStorage.setItem('wh_gallery',JSON.stringify(gallery));renderGallery()}
+function saveEmbedAsPreset(embedId){
+  const e=state.embeds.find(x=>x.id===embedId);
+  const name=prompt('Preset name:', e.title||'My preset');
+  if(!name) return;
+  const preset=JSON.parse(JSON.stringify(e));
+  preset.id=uid(); preset.name=name; preset.fields=preset.fields.map(f=>({...f}));
+  gallery.push(preset); saveGallery();
+  flashStatus('ok',`Saved "${name}" to the embed gallery.`);
+}
+function removeGalleryPreset(id){gallery=gallery.filter(g=>g.id!==id);saveGallery()}
+function resetGallery(){if(confirm('Reset the gallery to the built-in defaults? Custom presets you added will be lost.')){gallery=JSON.parse(JSON.stringify(DEFAULT_GALLERY));saveGallery()}}
+function exportGallery(){
+  const blob=new Blob([JSON.stringify(gallery,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='embed-gallery.json'; a.click();
+}
+function importGallery(file){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const d=JSON.parse(reader.result);
+      if(!Array.isArray(d)) throw new Error('Expected a list of presets.');
+      gallery=gallery.concat(d.map(p=>Object.assign({},p,{id:uid()})));
+      saveGallery();
+      flashStatus('ok',`Imported ${d.length} presets into the gallery.`);
+    }catch(err){flashStatus('err','Invalid gallery file: '+err.message)}
+  };
+  reader.readAsText(file);
+}
+function editGalleryPreset(id){
+  const g=gallery.find(x=>x.id===id); if(!g) return;
+  const name=prompt('Preset name:', g.name); if(name===null) return;
+  const color=prompt('Preset color (hex):', g.color) || g.color;
+  const title=prompt('Preset title:', g.title||''); 
+  const description=prompt('Preset description:', g.description||'');
+  g.name=name; g.color=color; g.title=title??g.title; g.description=description??g.description;
+  saveGallery();
+}
+function renderGallery(){
+  document.getElementById('presetGallery').innerHTML = gallery.length ? gallery.map(g=>`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="sw" style="background:${g.color};flex:1;margin-right:6px"></div>
+        <button class="icon-btn" style="padding:0 4px" title="Edit" onclick="event.stopPropagation();editGalleryPreset('${g.id}')">✎</button>
+        <button class="icon-btn" style="padding:0 0 4px 4px" title="Remove from gallery" onclick="event.stopPropagation();removeGalleryPreset('${g.id}')">✕</button>
+      </div>
+      <div onclick='addEmbed(${JSON.stringify(g).replace(/'/g,"&#39;")})' style="cursor:pointer">${escapeHtml(g.name)}</div>
+    </div>`).join('') : '<p class="hint">Gallery is empty — build an embed and click ☆ Save as gallery preset.</p>';
+}
+
+// ---------- visual buttons ----------
+function addBtn(){state.buttons.push({id:uid(),label:'Click me',style:'primary'});renderBtns();renderPreview()}
+function removeBtn(id){state.buttons=state.buttons.filter(b=>b.id!==id);renderBtns();renderPreview()}
+function updBtn(id,key,val){const b=state.buttons.find(x=>x.id===id);b[key]=val;renderPreview()}
+function renderBtns(){
+  document.getElementById('btnList').innerHTML = state.buttons.map(b=>`
+    <div class="var-row">
+      <input value="${escapeAttr(b.label)}" oninput="updBtn('${b.id}','label',this.value)">
+      <select onchange="updBtn('${b.id}','style',this.value)">
+        <option value="primary" ${b.style==='primary'?'selected':''}>Primary</option>
+        <option value="secondary" ${b.style==='secondary'?'selected':''}>Secondary</option>
+      </select>
+      <button class="icon-btn" onclick="removeBtn('${b.id}')">✕</button>
+    </div>`).join('') || '<p class="hint">No buttons added.</p>';
+}
+
+// ---------- preview ----------
+function fmtTime(){return new Date().toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}
+function renderPreview(){
+  const c = applyVars(state.content);
+  const uname = applyVars(state.username) || 'Webhook';
+  const avatar = state.avatar;
+  document.getElementById('previewBox').innerHTML = `<div class="msg">
+    <div class="avatar">${avatar?`<img src="${escapeAttr(avatar)}">`:uname.slice(0,1).toUpperCase()}</div>
+    <div style="flex:1;min-width:0">
+      <span class="name">${escapeHtml(uname)}</span><span class="tag">APP</span>
+      ${c?`<div class="content">${mdLite(escapeHtml(c))}</div>`:''}
+      ${state.embeds.map(e=>renderEmbedPreview(e)).join('')}
+      ${state.buttons.length?`<div class="btnrow">${state.buttons.map(b=>`<div class="fakebtn ${b.style}">${escapeHtml(b.label)}<button class="rm-btn" title="Remove" onclick="removeBtn('${b.id}')">✕</button></div>`).join('')}</div>`:''}
+    </div>
+  </div>`;
+  renderWarnings();
+}
+function renderEmbedPreview(e){
+  const title = applyVars(e.title), desc = applyVars(e.description);
+  return `<div class="embed" style="border-color:${e.color}">
+    <button class="rm-embed" title="Remove this embed" onclick="removeEmbed('${e.id}')">✕</button>
+    ${e.authorName?`<div class="e-author">${e.authorIcon?`<img src="${escapeAttr(e.authorIcon)}">`:''}${escapeHtml(e.authorName)}</div>`:''}
+    ${e.thumbnail?`<img class="e-thumb" src="${escapeAttr(e.thumbnail)}">`:''}
+    ${title?`<div class="e-title">${escapeHtml(title)}</div>`:''}
+    ${desc?`<div class="e-desc">${mdLite(escapeHtml(desc))}</div>`:''}
+    ${e.fields.length?`<div class="e-fields">${e.fields.map(f=>`<div class="e-field ${f.inline?'inline':'full'}"><b>${escapeHtml(applyVars(f.name))}</b>${mdLite(escapeHtml(applyVars(f.value)))}</div>`).join('')}</div>`:''}
+    ${e.image?`<img class="e-img" src="${escapeAttr(e.image)}">`:''}
+    ${(e.footerText||e.timestamp)?`<div class="e-footer">${e.footerIcon?`<img src="${escapeAttr(e.footerIcon)}">`:''}<span>${escapeHtml(e.footerText||'')}${e.footerText&&e.timestamp?' • ':''}${e.timestamp?fmtTime():''}</span></div>`:''}
+  </div>`;
+}
+function mdLite(s){
+  return s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<i>$1</i>')
+    .replace(/__(.+?)__/g,'<u>$1</u>').replace(/~~(.+?)~~/g,'<s>$1</s>')
+    .replace(/`([^`]+?)`/g,'<code style="background:#1e1f22;padding:1px 4px;border-radius:3px">$1</code>')
+    .replace(/\|\|(.+?)\|\|/g,'<span style="background:#1e1f22;color:transparent;border-radius:3px" onclick="this.style.color=\'#dbdee1\'">$1</span>');
+}
+function updateCounters(){const len=state.content.length;const el=document.getElementById('contentCounter');el.textContent=`${len} / ${LIMITS.content}`;el.className='counter'+(len>LIMITS.content?' over':'')}
+function renderWarnings(){
+  const w=[];
+  if(state.content.length>LIMITS.content) w.push('Content exceeds 2000 characters.');
+  if(state.embeds.length>LIMITS.maxEmbeds) w.push('More than 10 embeds.');
+  state.embeds.forEach((e,i)=>{if(embedSize(e)>LIMITS.totalEmbed) w.push(`Embed ${i+1} exceeds 6000 total characters.`)});
+  if(!state.content && !state.embeds.length) w.push('Message is empty — add content or an embed.');
+  const box=document.getElementById('warnBox');
+  if(w.length){box.style.display='block';box.innerHTML='⚠️ '+w.join('<br>⚠️ ')} else box.style.display='none';
+}
+
+document.getElementById('msgUsername').addEventListener('input',e=>{state.username=e.target.value;renderPreview()});
+document.getElementById('msgAvatar').addEventListener('input',e=>{state.avatar=e.target.value;renderPreview()});
+document.getElementById('msgContent').addEventListener('input',e=>{state.content=e.target.value;renderPreview();updateCounters()});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();sendMessage()}});
+
+// ---------- templates ----------
+function saveTemplate(){
+  const name=document.getElementById('tplName').value.trim();
+  if(!name) return alert('Name your template first.');
+  templates[name]=JSON.parse(JSON.stringify({state,vars,variants}));
+  localStorage.setItem('wh_templates',JSON.stringify(templates));
+  document.getElementById('tplName').value=''; renderTemplates();
+}
+function loadTemplate(name){
+  const t=templates[name]; if(!t) return;
+  state=JSON.parse(JSON.stringify(t.state));
+  vars=JSON.parse(JSON.stringify(t.vars||[]));
+  variants=JSON.parse(JSON.stringify(t.variants||[]));
+  syncInputsFromState();
+}
+function duplicateTemplate(name){
+  const copy=JSON.parse(JSON.stringify(templates[name]));
+  let newName=name+' copy', n=1;
+  while(templates[newName]) newName=name+' copy '+(++n);
+  templates[newName]=copy;
+  localStorage.setItem('wh_templates',JSON.stringify(templates));
+  renderTemplates();
+}
+function deleteTemplate(name){delete templates[name];localStorage.setItem('wh_templates',JSON.stringify(templates));renderTemplates()}
+function renderTemplates(){
+  const q=(document.getElementById('tplSearch')?.value||'').toLowerCase();
+  const names=Object.keys(templates).filter(n=>n.toLowerCase().includes(q));
+  document.getElementById('tplList').innerHTML = names.length? names.map(n=>`
+    <div class="li-item"><span onclick="loadTemplate('${n.replace(/'/g,"\\'")}')" style="cursor:pointer">📄 ${escapeHtml(n)}</span>
+    <button class="icon-btn" onclick="duplicateTemplate('${n.replace(/'/g,"\\'")}')" title="Duplicate">⧉</button>
+    <button class="icon-btn" onclick="deleteTemplate('${n.replace(/'/g,"\\'")}')">✕</button></div>`).join('') : '<p class="hint">No templates match.</p>';
+}
+function syncInputsFromState(){
+  document.getElementById('msgUsername').value=state.username;
+  document.getElementById('msgAvatar').value=state.avatar;
+  document.getElementById('msgContent').value=state.content;
+  if(!state.buttons) state.buttons=[];
+  renderEmbeds();renderVars();renderVariants();renderBtns();renderPreview();updateCounters();
+}
+
+// ---------- JSON / cURL ----------
+function buildPayload(useVariant){
+  const payload={};
+  const content = applyVars(useVariant?pickContent():state.content);
+  if(content) payload.content=content;
+  if(state.username) payload.username=applyVars(state.username);
+  if(state.avatar) payload.avatar_url=state.avatar;
+  if(state.embeds.length){
+    payload.embeds = state.embeds.map(e=>{
+      const em={};
+      if(e.title) em.title=applyVars(e.title);
+      if(e.url) em.url=e.url;
+      if(e.description) em.description=applyVars(e.description);
+      if(e.color) em.color=parseInt(e.color.replace('#',''),16);
+      if(e.authorName) em.author={name:applyVars(e.authorName), url:e.authorUrl||undefined, icon_url:e.authorIcon||undefined};
+      if(e.thumbnail) em.thumbnail={url:e.thumbnail};
+      if(e.image) em.image={url:e.image};
+      if(e.footerText||e.footerIcon) em.footer={text:applyVars(e.footerText)||'', icon_url:e.footerIcon||undefined};
+      if(e.timestamp) em.timestamp=new Date().toISOString();
+      if(e.fields.length) em.fields=e.fields.filter(f=>f.name||f.value).map(f=>({name:applyVars(f.name)||'\u200b',value:applyVars(f.value)||'\u200b',inline:!!f.inline}));
+      return em;
+    });
+  }
+  return payload;
+}
+function exportJson(){document.getElementById('jsonBox').value=JSON.stringify(buildPayload(false),null,2)}
+function exportCurl(){
+  const wh=webhooks.find(w=>w.id===activeWh);
+  const url = wh?wh.url:'https://discord.com/api/webhooks/ID/TOKEN';
+  document.getElementById('jsonBox').value = `curl -X POST "${url}" -H "Content-Type: application/json" -d '${JSON.stringify(buildPayload(false))}'`;
+}
+function copyBox(){navigator.clipboard.writeText(document.getElementById('jsonBox').value).then(()=>flashStatus('ok','Copied to clipboard.'))}
+function importJson(){
+  try{
+    const p=JSON.parse(document.getElementById('jsonBox').value);
+    state.content=p.content||''; state.username=p.username||''; state.avatar=p.avatar_url||'';
+    state.embeds=(p.embeds||[]).map(e=>({
+      id:uid(), color: e.color!=null ? '#'+e.color.toString(16).padStart(6,'0') : '#5865F2',
+      title:e.title||'', url:e.url||'', description:e.description||'',
+      authorName:e.author?.name||'', authorUrl:e.author?.url||'', authorIcon:e.author?.icon_url||'',
+      thumbnail:e.thumbnail?.url||'', image:e.image?.url||'',
+      footerText:e.footer?.text||'', footerIcon:e.footer?.icon_url||'', timestamp:!!e.timestamp,
+      fields:(e.fields||[]).map(f=>({id:uid(),name:f.name||'',value:f.value||'',inline:!!f.inline}))
+    }));
+    syncInputsFromState();
+    flashStatus('ok','Imported successfully.');
+  }catch(err){flashStatus('err','Invalid JSON: '+err.message)}
+}
+
+// ---------- backup ----------
+function exportBackup(){
+  const data={webhooks,templates,vars,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='webhook-studio-backup.json'; a.click();
+}
+function importBackup(file){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const d=JSON.parse(reader.result);
+      if(d.webhooks) webhooks=d.webhooks;
+      if(d.templates) templates=d.templates;
+      if(d.vars) vars=d.vars;
+      saveWh(); localStorage.setItem('wh_templates',JSON.stringify(templates));
+      renderTemplates(); renderVars();
+      flashStatus('ok','Backup imported.');
+    }catch(err){flashStatus('err','Invalid backup file: '+err.message)}
+  };
+  reader.readAsText(file);
+}
+
+// ---------- image gallery builder ----------
+let galImages = [];
+function addGalImage(){
+  const el=document.getElementById('galNewImg');
+  const url=el.value.trim();
+  if(!url) return;
+  galImages.push({id:uid(),url});
+  el.value='';
+  renderGalImages();
+}
+function removeGalImage(id){galImages=galImages.filter(g=>g.id!==id);renderGalImages()}
+function moveGalImage(id,dir){const i=galImages.findIndex(g=>g.id===id),j=i+dir;if(j<0||j>=galImages.length)return;[galImages[i],galImages[j]]=[galImages[j],galImages[i]];renderGalImages()}
+function clearGalImages(){galImages=[];renderGalImages()}
+function renderGalImages(){
+  document.getElementById('galCount').textContent=galImages.length;
+  document.getElementById('galImages').innerHTML = galImages.length ? galImages.map((g,i)=>`
+    <div class="li-item">
+      <span>${i+1}. ${escapeHtml(g.url)}</span>
+      <button class="icon-btn" onclick="moveGalImage('${g.id}',-1)">↑</button>
+      <button class="icon-btn" onclick="moveGalImage('${g.id}',1)">↓</button>
+      <button class="icon-btn" onclick="removeGalImage('${g.id}')">✕</button>
+    </div>`).join('') : '<p class="hint">No images added yet.</p>';
+}
+function buildImageGallery(){
+  if(!galImages.length) return flashStatus('err','Add at least one image first.');
+  const url=document.getElementById('galUrl').value.trim() || ('https://gallery.local/'+uid());
+  const title=document.getElementById('galTitle').value.trim();
+  const description=document.getElementById('galDesc').value.trim();
+  const color=document.getElementById('galColor').value;
+  const room = LIMITS.maxEmbeds - state.embeds.length;
+  if(room<=0) return flashStatus('err','Already at the 10-embed limit — remove some embeds first.');
+  const toAdd = galImages.slice(0, room);
+  if(toAdd.length < galImages.length) flashStatus('info',`Only ${room} slots left — added the first ${toAdd.length} images.`);
+  toAdd.forEach((g,i)=>{
+    state.embeds.push({
+      id:uid(), color, url,
+      title: i===0 ? title : '',
+      description: i===0 ? description : '',
+      authorName:'',authorUrl:'',authorIcon:'',thumbnail:'',
+      image: g.url, footerText:'', footerIcon:'', timestamp:false, fields:[]
+    });
+  });
+  renderEmbeds(); renderPreview();
+  flashStatus('ok', `Added ${toAdd.length} images as a gallery block — check the Embeds tab to remove any individually.`);
+}
+
+// ---------- bot connect (channel ID -> webhook) ----------
+function flashBotStatus(type,msg){const box=document.getElementById('botStatus');box.className='status '+type;box.textContent=msg}
+(function(){const t=localStorage.getItem('wh_bot_token');if(t){document.getElementById('botToken').value=t;document.getElementById('rememberToken').checked=true}})();
+document.getElementById('rememberToken').addEventListener('change',e=>{
+  if(!e.target.checked) localStorage.removeItem('wh_bot_token');
+});
+async function createWebhookForChannel(){
+  const token=document.getElementById('botToken').value.trim();
+  const channelId=document.getElementById('botChannelId').value.trim();
+  const name=document.getElementById('botWhName').value.trim()||'Abyss Webhook Studio';
+  if(!token||!channelId) return flashBotStatus('err','Bot token and channel ID are both required.');
+  if(document.getElementById('rememberToken').checked) localStorage.setItem('wh_bot_token',token);
+  flashBotStatus('info','Contacting Discord…');
+  try{
+    const listRes=await fetch(`https://discord.com/api/v10/channels/${channelId}/webhooks`,{headers:{Authorization:`Bot ${token}`}});
+    if(listRes.status===401) throw new Error('Invalid bot token.');
+    if(listRes.status===403) throw new Error("Bot lacks the Manage Webhooks permission in that channel.");
+    if(listRes.status===404) throw new Error('Channel not found — check the ID and that the bot is actually in that server.');
+    if(!listRes.ok){const d=await listRes.json().catch(()=>({}));throw new Error(d.message||`Discord error ${listRes.status}`)}
+    const existing=await listRes.json();
+    let hook=existing.find(w=>w.name===name && w.token);
+    if(!hook){
+      const createRes=await fetch(`https://discord.com/api/v10/channels/${channelId}/webhooks`,{
+        method:'POST',
+        headers:{Authorization:`Bot ${token}`,'Content-Type':'application/json'},
+        body:JSON.stringify({name})
+      });
+      if(!createRes.ok){const d=await createRes.json().catch(()=>({}));throw new Error(d.message||`Discord error ${createRes.status}`)}
+      hook=await createRes.json();
+    }
+    const url=`https://discord.com/api/webhooks/${hook.id}/${hook.token}`;
+    const id=uid();
+    webhooks.push({id,name:`#${channelId} (${name})`,url});
+    activeWh=id; saveWh();
+    flashBotStatus('ok',`Webhook ready ✓ — added to your webhook list, pointed at channel ${channelId}.`);
+  }catch(err){
+    if(err instanceof TypeError){
+      flashBotStatus('err','Request blocked (likely CORS) — Discord generally does not allow bot-authenticated calls directly from a browser tab on another domain. This needs a small server-side relay to work reliably; ask and I can build one.');
+    }else{
+      flashBotStatus('err',err.message);
+    }
+  }
+}
+
+// ---------- scheduling ----------
+function scheduleSend(){
+  const wh=webhooks.find(w=>w.id===activeWh);
+  if(!wh) return flashStatus('err','Select a webhook first.');
+  const mins=parseFloat(document.getElementById('schedMinutes').value)||1;
+  const fireAt=Date.now()+mins*60000;
+  const payloadSnapshot=JSON.parse(JSON.stringify(state));
+  const id=uid();
+  const timer=setTimeout(async ()=>{
+    const backup=state; state=payloadSnapshot;
+    try{ await doSend(wh,null); logHistory(wh.name,true,'scheduled send fired'); }
+    catch(err){ logHistory(wh.name,false,err.message); }
+    state=backup;
+    scheduled=scheduled.filter(s=>s.id!==id); renderScheduled();
+  }, mins*60000);
+  scheduled.push({id,wh:wh.name,fireAt,timer});
+  renderScheduled();
+  flashStatus('ok',`Scheduled for ${wh.name} in ${mins} min.`);
+}
+function cancelScheduled(id){
+  const s=scheduled.find(x=>x.id===id);
+  if(s){clearTimeout(s.timer);scheduled=scheduled.filter(x=>x.id!==id);renderScheduled()}
+}
+function renderScheduled(){
+  document.getElementById('schedList').innerHTML = scheduled.length? scheduled.map(s=>`
+    <div class="li-item"><span>${s.wh} — ${new Date(s.fireAt).toLocaleTimeString()}</span>
+    <button class="icon-btn" onclick="cancelScheduled('${s.id}')">✕</button></div>`).join('') : '<p class="hint">Nothing scheduled.</p>';
+}
+
+// ---------- history ----------
+function logHistory(target,ok,detail){
+  history_.unshift({time:new Date().toLocaleTimeString(),target,ok,detail});
+  history_=history_.slice(0,30);
+  localStorage.setItem('wh_history',JSON.stringify(history_));
+  renderHistory();
+}
+function clearHistory(){history_=[];localStorage.setItem('wh_history','[]');renderHistory()}
+function renderHistory(){
+  const ok=history_.filter(h=>h.ok).length, fail=history_.length-ok;
+  const rate=history_.length ? Math.round(ok/history_.length*100) : 0;
+  document.getElementById('statsRow').innerHTML = `
+    <div class="li-item" style="justify-content:center"><span>Total: <b>${history_.length}</b></span></div>
+    <div class="li-item ok" style="justify-content:center"><span>Sent: <b>${ok}</b></span></div>
+    <div class="li-item err" style="justify-content:center"><span>Failed: <b>${fail}</b></span></div>
+    <div class="li-item" style="justify-content:center"><span>Success: <b>${rate}%</b></span></div>`;
+  document.getElementById('histList').innerHTML = history_.length? history_.map(h=>`
+    <div class="li-item ${h.ok?'ok':'err'}"><span>${h.time} — ${escapeHtml(h.target)}: ${escapeHtml(h.detail)}</span></div>`).join('') : '<p class="hint">No sends yet.</p>';
+}
+
+// ---------- send ----------
+function flashStatus(type,msg){const box=document.getElementById('statusBox');box.className='status '+type;box.textContent=msg}
+async function doSend(wh,editId){
+  const payload=buildPayload(true);
+  if(!payload.content && !payload.embeds) throw new Error('Message is empty.');
+  const url = editId ? `${wh.url}/messages/${editId}` : `${wh.url}?wait=true`;
+  const res = await fetch(url,{method:editId?'PATCH':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(res.status===429){const d=await res.json().catch(()=>({}));throw new Error(`Rate limited, retry after ${d.retry_after||'?'}s`)}
+  if(!res.ok){const d=await res.json().catch(()=>({}));throw new Error(`${res.status}: ${d.message||res.statusText}`)}
+  const d=await res.json().catch(()=>null);
+  return d;
+}
+async function sendMessage(){
+  const wh=webhooks.find(w=>w.id===activeWh);
+  if(!wh) return flashStatus('err','Add and select a webhook first.');
+  const editId=document.getElementById('editMsgId').value.trim();
+  flashStatus('info','Sending…');
+  try{
+    const d=await doSend(wh,editId);
+    if(d && d.id) document.getElementById('editMsgId').value=d.id;
+    flashStatus('ok', editId?'Message edited ✓':'Sent ✓');
+    logHistory(wh.name,true,editId?'edited':'sent');
+  }catch(err){flashStatus('err',err.message);logHistory(wh.name,false,err.message)}
+}
+async function sendBulk(){
+  const targets=webhooks.filter(w=>checkedWh.has(w.id));
+  if(!targets.length) return flashStatus('err','Check at least one webhook in the list.');
+  flashStatus('info',`Sending to ${targets.length} webhooks…`);
+  for(const wh of targets){
+    try{ await doSend(wh,null); logHistory(wh.name,true,'bulk sent'); }
+    catch(err){ logHistory(wh.name,false,err.message); }
+    await new Promise(r=>setTimeout(r,400));
+  }
+  flashStatus('ok',`Bulk send finished — check History for per-webhook results.`);
+}
+async function checkWebhook(){
+  const wh=webhooks.find(w=>w.id===activeWh);
+  if(!wh) return flashStatus('err','Select a webhook first.');
+  try{
+    const res=await fetch(wh.url);
+    if(res.ok){const d=await res.json();flashStatus('ok',`Valid ✓ — "${d.name}" in channel ${d.channel_id}`)}
+    else flashStatus('err','Webhook URL looks invalid ('+res.status+').');
+  }catch(err){flashStatus('err','Could not reach Discord: '+err.message)}
+}
+
+// ---------- init ----------
+state.buttons=[];
+renderWh();renderTemplates();renderVars();renderVariants();renderBtns();renderEmbeds();renderGallery();renderGalImages();renderPreview();updateCounters();renderHistory();renderScheduled();
+document.getElementById('galNewImg').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addGalImage()}});
+</script>
+</body>
+</html>
