@@ -13,7 +13,12 @@ body.compact label{margin:6px 0 3px}
 body.compact .field-row,body.compact .var-row{margin-bottom:4px;padding:6px}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);position:relative;overflow-x:hidden}
+#netBg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+header,.wrap,.footer-note{position:relative;z-index:1}
+header{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:color-mix(in srgb, var(--panel) 72%, transparent)}
+.panel{background:color-mix(in srgb, var(--panel) 78%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,.18);transition:border-color .2s}
+.panel:hover{border-color:color-mix(in srgb, var(--accent) 45%, var(--border))}
 header{position:sticky;top:env(safe-area-inset-top,0);z-index:20;display:flex;align-items:center;gap:10px;padding:10px 18px;background:linear-gradient(180deg,var(--panel),var(--panel2));border-bottom:1px solid var(--border);flex-wrap:wrap;box-shadow:0 1px 0 var(--accent)33}
 header h1{font-size:15px;margin:0;font-weight:700;flex:1}
 button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:8px 14px;background:var(--accent);color:#fff;font-weight:600;transition:.15s}
@@ -21,7 +26,7 @@ button:hover{background:var(--accent-hover)}
 button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border)}
 button.secondary:hover{background:var(--border)}
 button.small{padding:5px 10px;font-size:12px}
-input,textarea,select{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 10px;font:inherit;font-size:13px;resize:vertical;}
+input,textarea,select{width:100%;background:color-mix(in srgb, var(--panel2) 85%, transparent);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 10px;font:inherit;font-size:13px;resize:vertical;}
 input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
 input[type=color]{padding:2px;height:32px}
 label{font-size:12px;font-weight:600;color:var(--sub);display:block;margin:10px 0 4px}
@@ -29,14 +34,13 @@ label{font-size:12px;font-weight:600;color:var(--sub);display:block;margin:10px 
 .row>*{flex:1;min-width:0}
 .wrap{display:grid;grid-template-columns:1fr;gap:16px;max-width:1480px;margin:0 auto;padding:16px}
 @media(min-width:1000px){.wrap{grid-template-columns:1.15fr 1fr;align-items:start}}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
 .panel>h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
 .tabs{display:flex;gap:2px;margin-bottom:12px;border-bottom:1px solid var(--border);overflow-x:auto}
 .tabs button{background:none;color:var(--sub);border-radius:6px 6px 0 0;padding:8px 12px;font-size:12px;white-space:nowrap}
 .tabs button.active{color:var(--accent);border-bottom:2px solid var(--accent);background:none}
 .tabpane{display:none}
 .tabpane.active{display:block}
-.embed-block{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;background:var(--panel2)}
+.embed-block{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;background:color-mix(in srgb, var(--panel2) 85%, transparent)}
 .embed-block .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .embed-block .hd strong{font-size:13px}
 .field-row{display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;padding:8px;border:1px solid var(--border);border-radius:6px}
@@ -49,7 +53,8 @@ label{font-size:12px;font-weight:600;color:var(--sub);display:block;margin:10px 
 .counter.over{color:var(--danger);font-weight:700}
 .hint{font-size:11px;color:var(--sub);margin-top:4px}
 .list-scroll{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:240px;overflow-y:auto}
-.li-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);font-size:13px}
+.li-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:8px;background:color-mix(in srgb, var(--panel2) 85%, transparent);font-size:13px;transition:border-color .15s}
+.li-item:hover{border-color:color-mix(in srgb, var(--accent) 40%, var(--border))}
 .li-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .li-item.active{border-color:var(--accent)}
 .li-item.ok{border-left:3px solid var(--ok)}
@@ -105,8 +110,9 @@ textarea.json{min-height:120px;font-family:ui-monospace,monospace;font-size:12px
 </style>
 </head>
 <body>
+<canvas id="netBg"></canvas>
 <header>
-  <h1>🕳️ Abyss Webhook Studio</h1>
+  <h1>Abyss Webhook Studio</h1>
   <label class="checkbox-inline" style="margin:0">Theme
     <select id="themePreset" style="width:auto;padding:4px 8px" onchange="applyThemePreset(this.value)">
       <option value="abyss">Abyss (violet)</option>
@@ -216,6 +222,8 @@ textarea.json{min-height:120px;font-family:ui-monospace,monospace;font-size:12px
     <h2>Compose</h2>
     <div class="tabs">
       <button class="active" data-t="cmp-msg" onclick="switchTab(this,'cmp')">Message</button>
+      <button data-t="cmp-attach" onclick="switchTab(this,'cmp')">Attachments</button>
+      <button data-t="cmp-poll" onclick="switchTab(this,'cmp')">Poll</button>
       <button data-t="cmp-embeds" onclick="switchTab(this,'cmp')">Embeds</button>
       <button data-t="cmp-imggallery" onclick="switchTab(this,'cmp')">Image Gallery</button>
       <button data-t="cmp-presets" onclick="switchTab(this,'cmp')">Preset Library</button>
@@ -238,6 +246,29 @@ textarea.json{min-height:120px;font-family:ui-monospace,monospace;font-size:12px
         <span class="chip" onclick="insertMention('user')">User mention…</span>
         <span class="chip" onclick="insertAtCursor('msgContent','<t:'+Math.floor(Date.now()/1000)+':R>')">Relative timestamp</span>
       </div>
+    </div>
+
+    <div class="tabpane" id="cmp-attach">
+      <p class="hint">Attach real files (not just image URLs) — sent as a genuine multipart upload, just like dragging a file into Discord.</p>
+      <input type="file" id="attachInput" multiple onchange="addAttachments(this.files)">
+      <div class="list-scroll" id="attachList" style="margin-top:10px"></div>
+      <div class="counter" id="attachSize">0 MB / 25 MB (Discord's default limit)</div>
+    </div>
+
+    <div class="tabpane" id="cmp-poll">
+      <label class="checkbox-inline"><input type="checkbox" id="pollEnabled" onchange="renderPreview()"> Include a poll with this message</label>
+      <p class="hint">Discord polls sent via webhook — support can vary by channel/server settings, so verify with a test send.</p>
+      <label>Question</label>
+      <input id="pollQuestion" placeholder="What should we build next?" oninput="renderPreview()">
+      <label>Answers</label>
+      <div id="pollAnswers"></div>
+      <button class="secondary small" onclick="addPollAnswer()">+ Add answer</button>
+      <label style="margin-top:10px">Duration</label>
+      <select id="pollDuration" onchange="renderPreview()">
+        <option value="1">1 hour</option><option value="4">4 hours</option><option value="8">8 hours</option>
+        <option value="24" selected>24 hours</option><option value="72">3 days</option><option value="168">7 days</option>
+      </select>
+      <label class="checkbox-inline" style="margin-top:8px"><input type="checkbox" id="pollMulti" onchange="renderPreview()"> Allow multiple answer selection</label>
     </div>
 
     <div class="tabpane" id="cmp-embeds">
@@ -312,15 +343,37 @@ textarea.json{min-height:120px;font-family:ui-monospace,monospace;font-size:12px
     <h2>Send</h2>
     <label>Active webhook (single send)</label>
     <select id="sendTarget"></select>
+    <label>Thread ID (optional — sends into a thread under this webhook's channel)</label>
+    <input id="threadId" placeholder="e.g. 123456789012345678">
+
+    <label style="margin-top:10px">Send mode</label>
+    <div class="row">
+      <label class="checkbox-inline"><input type="radio" name="sendMode" value="new" checked onchange="renderSendMode()"> New message</label>
+      <label class="checkbox-inline"><input type="radio" name="sendMode" value="edit" onchange="renderSendMode()"> Edit existing</label>
+    </div>
+    <div id="editModeBox" style="display:none">
+      <input id="editMsgId" placeholder="Message ID to edit" style="margin-top:6px">
+      <div class="list-scroll" id="recentSends" style="margin-top:6px"></div>
+    </div>
+
     <div class="row" style="margin-top:10px">
-      <button onclick="sendMessage()">🚀 Send now <span class="hint" style="color:#fff8">(Ctrl+Enter)</span></button>
+      <button onclick="sendMessage()">🚀 Send <span class="hint" style="color:#fff8">(Ctrl+Enter)</span></button>
       <button class="secondary" onclick="checkWebhook()">✓ Verify URL</button>
     </div>
     <div class="row" style="margin-top:8px">
       <button class="secondary" onclick="sendBulk()">📤 Send to checked webhooks</button>
     </div>
-    <label style="margin-top:10px">Edit existing message (optional)</label>
-    <input id="editMsgId" placeholder="Message ID to edit instead of posting new">
+
+    <label style="margin-top:12px">Repeat send</label>
+    <p class="hint">Sends the same message multiple times in a row, spaced out to respect Discord's rate limits. Capped at 50 and a 2s-minimum interval — please only point this at channels you own or moderate; flooding channels violates Discord's ToS and can get a webhook deleted.</p>
+    <div class="row">
+      <input type="number" id="repeatCount" placeholder="Times" min="1" max="50" value="3">
+      <input type="number" id="repeatInterval" placeholder="Seconds apart" min="2" value="3">
+      <button class="secondary" onclick="repeatSend()">🔁 Repeat send</button>
+    </div>
+    <div id="repeatProgress" class="hint"></div>
+    <button class="secondary small" id="repeatStopBtn" style="display:none;margin-top:6px" onclick="stopRepeat()">■ Stop repeating</button>
+
     <div class="warn-box" id="warnBox"></div>
     <div class="status" id="statusBox"></div>
   </div>
@@ -331,6 +384,31 @@ textarea.json{min-height:120px;font-family:ui-monospace,monospace;font-size:12px
 
 <script>
 let state = { username:'', avatar:'', content:'', embeds:[], buttons:[] };
+let pollAnswers = [{id:uid(),text:''},{id:uid(),text:''}];
+let attachedFiles = [];
+let sentMessages = JSON.parse(localStorage.getItem('wh_sent_msgs')||'[]');
+let repeatStop = false;
+function addPollAnswer(){if(pollAnswers.length>=10)return alert('Discord allows up to 10 poll answers.');pollAnswers.push({id:uid(),text:''});renderPollAnswers()}
+function removePollAnswer(id){pollAnswers=pollAnswers.filter(a=>a.id!==id);renderPollAnswers();renderPreview()}
+function updPollAnswer(id,val){const a=pollAnswers.find(x=>x.id===id);a.text=val;renderPreview()}
+function renderPollAnswers(){
+  document.getElementById('pollAnswers').innerHTML = pollAnswers.map((a,i)=>`
+    <div class="var-row"><input placeholder="Answer ${i+1}" value="${escapeAttr(a.text)}" oninput="updPollAnswer('${a.id}',this.value)">
+    <button class="icon-btn" onclick="removePollAnswer('${a.id}')">✕</button></div>`).join('');
+}
+function addAttachments(fileList){
+  [...fileList].forEach(f=>attachedFiles.push(f));
+  renderAttachList();
+  document.getElementById('attachInput').value='';
+}
+function removeAttachment(i){attachedFiles.splice(i,1);renderAttachList()}
+function renderAttachList(){
+  const totalMB=(attachedFiles.reduce((a,f)=>a+f.size,0)/1048576).toFixed(2);
+  document.getElementById('attachSize').textContent=`${totalMB} MB / 25 MB (Discord's default limit)`;
+  document.getElementById('attachList').innerHTML = attachedFiles.length ? attachedFiles.map((f,i)=>`
+    <div class="li-item"><span>📎 ${escapeHtml(f.name)} (${(f.size/1024).toFixed(0)} KB)</span>
+    <button class="icon-btn" onclick="removeAttachment(${i})">✕</button></div>`).join('') : '<p class="hint">No files attached.</p>';
+}
 let vars = [], variants = [], scheduled = [];
 let webhooks = JSON.parse(localStorage.getItem('wh_list')||'[]');
 let activeWh = localStorage.getItem('wh_active')||null;
@@ -630,12 +708,21 @@ function renderPreview(){
   const c = applyVars(state.content);
   const uname = applyVars(state.username) || 'Webhook';
   const avatar = state.avatar;
+  const pollOn = document.getElementById('pollEnabled')?.checked;
+  const pollHtml = pollOn ? `<div class="embed" style="border-color:var(--accent)">
+      <div class="e-title">📊 ${escapeHtml(applyVars(document.getElementById('pollQuestion').value||'Poll question'))}</div>
+      ${pollAnswers.filter(a=>a.text.trim()).map(a=>`<div style="background:#1e1f22;border-radius:4px;padding:6px 10px;margin-top:4px;font-size:13px">${escapeHtml(applyVars(a.text))}</div>`).join('')}
+      <div class="e-footer"><span>${document.getElementById('pollDuration').value}h${document.getElementById('pollMulti').checked?' · multiple choice':''}</span></div>
+    </div>` : '';
+  const attachHtml = attachedFiles.length ? `<div class="btnrow">${attachedFiles.map(f=>`<div class="fakebtn">📎 ${escapeHtml(f.name)}</div>`).join('')}</div>` : '';
   document.getElementById('previewBox').innerHTML = `<div class="msg">
     <div class="avatar">${avatar?`<img src="${escapeAttr(avatar)}">`:uname.slice(0,1).toUpperCase()}</div>
     <div style="flex:1;min-width:0">
       <span class="name">${escapeHtml(uname)}</span><span class="tag">APP</span>
       ${c?`<div class="content">${mdLite(escapeHtml(c))}</div>`:''}
       ${state.embeds.map(e=>renderEmbedPreview(e)).join('')}
+      ${pollHtml}
+      ${attachHtml}
       ${state.buttons.length?`<div class="btnrow">${state.buttons.map(b=>`<div class="fakebtn ${b.style}">${escapeHtml(b.label)}<button class="rm-btn" title="Remove" onclick="removeBtn('${b.id}')">✕</button></div>`).join('')}</div>`:''}
     </div>
   </div>`;
@@ -738,6 +825,18 @@ function buildPayload(useVariant){
       if(e.fields.length) em.fields=e.fields.filter(f=>f.name||f.value).map(f=>({name:applyVars(f.name)||'\u200b',value:applyVars(f.value)||'\u200b',inline:!!f.inline}));
       return em;
     });
+  }
+  if(document.getElementById('pollEnabled')?.checked){
+    const q=document.getElementById('pollQuestion').value.trim();
+    if(q && pollAnswers.filter(a=>a.text.trim()).length){
+      payload.poll = {
+        question:{text:applyVars(q)},
+        answers: pollAnswers.filter(a=>a.text.trim()).map((a,i)=>({answer_id:i+1, poll_media:{text:applyVars(a.text)}})),
+        duration: parseInt(document.getElementById('pollDuration').value,10),
+        allow_multiselect: document.getElementById('pollMulti').checked,
+        layout_type:1
+      };
+    }
   }
   return payload;
 }
@@ -929,11 +1028,45 @@ function renderHistory(){
 
 // ---------- send ----------
 function flashStatus(type,msg){const box=document.getElementById('statusBox');box.className='status '+type;box.textContent=msg}
+function renderSendMode(){
+  const mode=document.querySelector('input[name="sendMode"]:checked').value;
+  document.getElementById('editModeBox').style.display = mode==='edit' ? 'block' : 'none';
+  if(mode==='edit') renderRecentSends();
+}
+function logSentMessage(wh,msgId,snippet){
+  sentMessages.unshift({id:uid(),webhookId:wh.id,webhookName:wh.name,msgId,time:new Date().toLocaleString(),snippet:(snippet||'').slice(0,40)});
+  sentMessages=sentMessages.slice(0,25);
+  localStorage.setItem('wh_sent_msgs',JSON.stringify(sentMessages));
+}
+function renderRecentSends(){
+  const relevant=sentMessages.filter(s=>s.webhookId===activeWh);
+  document.getElementById('recentSends').innerHTML = relevant.length ? relevant.map(s=>`
+    <div class="li-item"><span onclick="document.getElementById('editMsgId').value='${s.msgId}'" style="cursor:pointer">${s.time} — ${escapeHtml(s.snippet)||'(embed only)'}</span></div>`).join('')
+    : '<p class="hint">No tracked sent messages for this webhook yet.</p>';
+}
+function buildUrl(wh,editId){
+  const thread=document.getElementById('threadId').value.trim();
+  let url = editId ? `${wh.url}/messages/${editId}` : wh.url;
+  const params=[];
+  if(!editId) params.push('wait=true');
+  if(thread) params.push(`thread_id=${encodeURIComponent(thread)}`);
+  if(params.length) url += '?'+params.join('&');
+  return url;
+}
 async function doSend(wh,editId){
   const payload=buildPayload(true);
-  if(!payload.content && !payload.embeds) throw new Error('Message is empty.');
-  const url = editId ? `${wh.url}/messages/${editId}` : `${wh.url}?wait=true`;
-  const res = await fetch(url,{method:editId?'PATCH':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(!payload.content && !payload.embeds && !attachedFiles.length) throw new Error('Message is empty.');
+  const url = buildUrl(wh,editId);
+  let opts;
+  if(attachedFiles.length){
+    const fd=new FormData();
+    fd.append('payload_json', JSON.stringify(payload));
+    attachedFiles.forEach((f,i)=>fd.append(`files[${i}]`,f,f.name));
+    opts={method:editId?'PATCH':'POST',body:fd};
+  }else{
+    opts={method:editId?'PATCH':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)};
+  }
+  const res = await fetch(url,opts);
   if(res.status===429){const d=await res.json().catch(()=>({}));throw new Error(`Rate limited, retry after ${d.retry_after||'?'}s`)}
   if(!res.ok){const d=await res.json().catch(()=>({}));throw new Error(`${res.status}: ${d.message||res.statusText}`)}
   const d=await res.json().catch(()=>null);
@@ -942,11 +1075,13 @@ async function doSend(wh,editId){
 async function sendMessage(){
   const wh=webhooks.find(w=>w.id===activeWh);
   if(!wh) return flashStatus('err','Add and select a webhook first.');
-  const editId=document.getElementById('editMsgId').value.trim();
+  const mode=document.querySelector('input[name="sendMode"]:checked').value;
+  const editId= mode==='edit' ? document.getElementById('editMsgId').value.trim() : '';
+  if(mode==='edit' && !editId) return flashStatus('err','Enter a message ID to edit, or switch to New message.');
   flashStatus('info','Sending…');
   try{
     const d=await doSend(wh,editId);
-    if(d && d.id) document.getElementById('editMsgId').value=d.id;
+    if(d && d.id){ document.getElementById('editMsgId').value=d.id; if(!editId) logSentMessage(wh,d.id,state.content); }
     flashStatus('ok', editId?'Message edited ✓':'Sent ✓');
     logHistory(wh.name,true,editId?'edited':'sent');
   }catch(err){flashStatus('err',err.message);logHistory(wh.name,false,err.message)}
@@ -956,11 +1091,31 @@ async function sendBulk(){
   if(!targets.length) return flashStatus('err','Check at least one webhook in the list.');
   flashStatus('info',`Sending to ${targets.length} webhooks…`);
   for(const wh of targets){
-    try{ await doSend(wh,null); logHistory(wh.name,true,'bulk sent'); }
+    try{ const d=await doSend(wh,null); if(d&&d.id) logSentMessage(wh,d.id,state.content); logHistory(wh.name,true,'bulk sent'); }
     catch(err){ logHistory(wh.name,false,err.message); }
     await new Promise(r=>setTimeout(r,400));
   }
   flashStatus('ok',`Bulk send finished — check History for per-webhook results.`);
+}
+function stopRepeat(){repeatStop=true}
+async function repeatSend(){
+  const wh=webhooks.find(w=>w.id===activeWh);
+  if(!wh) return flashStatus('err','Select a webhook first.');
+  let count=parseInt(document.getElementById('repeatCount').value,10)||1;
+  let interval=parseFloat(document.getElementById('repeatInterval').value)||2;
+  count=Math.min(Math.max(count,1),50);
+  interval=Math.max(interval,2);
+  repeatStop=false;
+  document.getElementById('repeatStopBtn').style.display='inline-block';
+  for(let i=1;i<=count;i++){
+    if(repeatStop){ document.getElementById('repeatProgress').textContent=`Stopped after ${i-1}/${count}.`; break; }
+    document.getElementById('repeatProgress').textContent=`Sending ${i}/${count}…`;
+    try{ const d=await doSend(wh,null); if(d&&d.id) logSentMessage(wh,d.id,state.content); logHistory(wh.name,true,`repeat ${i}/${count}`); }
+    catch(err){ logHistory(wh.name,false,err.message); document.getElementById('repeatProgress').textContent=`Error on ${i}/${count}: ${err.message}`; }
+    if(i<count) await new Promise(r=>setTimeout(r,interval*1000));
+  }
+  if(!repeatStop) document.getElementById('repeatProgress').textContent=`Done — sent ${count} times.`;
+  document.getElementById('repeatStopBtn').style.display='none';
 }
 async function checkWebhook(){
   const wh=webhooks.find(w=>w.id===activeWh);
@@ -974,8 +1129,61 @@ async function checkWebhook(){
 
 // ---------- init ----------
 state.buttons=[];
-renderWh();renderTemplates();renderVars();renderVariants();renderBtns();renderEmbeds();renderGallery();renderGalImages();renderPreview();updateCounters();renderHistory();renderScheduled();
+renderWh();renderTemplates();renderVars();renderVariants();renderBtns();renderEmbeds();renderGallery();renderGalImages();renderPreview();updateCounters();renderHistory();renderScheduled();renderPollAnswers();renderAttachList();
 document.getElementById('galNewImg').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addGalImage()}});
+// ---------- animated network background ----------
+(function(){
+  const canvas=document.getElementById('netBg');
+  const ctx=canvas.getContext('2d');
+  let w,h,points,animId;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){
+    w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight;
+    const count=Math.min(90, Math.floor((w*h)/22000));
+    points=Array.from({length:count},()=>({
+      x:Math.random()*w, y:Math.random()*h,
+      vx:(Math.random()-.5)*(reduceMotion?0:.25),
+      vy:(Math.random()-.5)*(reduceMotion?0:.25)
+    }));
+  }
+  function accentColor(){
+    return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#7C5CFF';
+  }
+  function hexToRgb(hex){
+    hex=hex.replace('#','');
+    if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+    const n=parseInt(hex,16);
+    return [(n>>16)&255,(n>>8)&255,n&255];
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    const [r,g,b]=hexToRgb(accentColor());
+    for(const p of points){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>w) p.vx*=-1;
+      if(p.y<0||p.y>h) p.vy*=-1;
+    }
+    for(let i=0;i<points.length;i++){
+      for(let j=i+1;j<points.length;j++){
+        const dx=points[i].x-points[j].x, dy=points[i].y-points[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<140){
+          ctx.strokeStyle=`rgba(${r},${g},${b},${(1-dist/140)*0.35})`;
+          ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(points[i].x,points[i].y); ctx.lineTo(points[j].x,points[j].y); ctx.stroke();
+        }
+      }
+    }
+    for(const p of points){
+      ctx.fillStyle=`rgba(${r},${g},${b},0.7)`;
+      ctx.beginPath(); ctx.arc(p.x,p.y,1.6,0,Math.PI*2); ctx.fill();
+    }
+    animId=requestAnimationFrame(draw);
+  }
+  resize();
+  draw();
+  window.addEventListener('resize',()=>{cancelAnimationFrame(animId);resize();draw()});
+})();
 </script>
 </body>
 </html>
